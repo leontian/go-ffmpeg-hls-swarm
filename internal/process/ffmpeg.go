@@ -86,6 +86,7 @@ type FFmpegConfig struct {
 	// Only safe when socket mode is enabled (otherwise debug output
 	// would corrupt progress parsing on stdout).
 	DebugLogging bool
+
 }
 
 // DefaultFFmpegConfig returns an FFmpegConfig with sensible defaults.
@@ -98,7 +99,7 @@ func DefaultFFmpegConfig(streamURL string) *FFmpegConfig {
 		Timeout:           15 * time.Second,
 		Reconnect:         true,
 		ReconnectDelayMax: 5,
-		SegMaxRetry:       3,
+		SegMaxRetry:       0, // 0 = omit flag (avoids segment-skipping on live fMP4)
 		LogLevel:          "info",
 		ProgramID:         -1, // Not set
 	}
@@ -240,8 +241,11 @@ func (r *FFmpegRunner) buildArgs() []string {
 		args = append(args, "-headers", strings.Join(headers, "\r\n")+"\r\n")
 	}
 
-	// Segment retry
-	args = append(args, "-seg_max_retry", strconv.Itoa(r.config.SegMaxRetry))
+	// Segment retry (only pass if explicitly set; default 0 omits the flag
+	// to avoid segment-skipping bugs in some FFmpeg versions)
+	if r.config.SegMaxRetry > 0 {
+		args = append(args, "-seg_max_retry", strconv.Itoa(r.config.SegMaxRetry))
+	}
 
 	// Input URL (potentially rewritten for IP override)
 	inputURL := r.effectiveURL()

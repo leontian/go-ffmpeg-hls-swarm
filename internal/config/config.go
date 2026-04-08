@@ -102,7 +102,7 @@ func DefaultConfig() *Config {
 		Timeout:           15 * time.Second,
 		Reconnect:         true,
 		ReconnectDelayMax: 5,
-		SegMaxRetry:       3,
+		SegMaxRetry:       0, // 0 = omit -seg_max_retry (avoids segment-skipping on live fMP4)
 		LogLevel:          "info",
 
 		// Health
