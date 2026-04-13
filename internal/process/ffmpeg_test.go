@@ -26,7 +26,7 @@ func TestDefaultFFmpegConfig(t *testing.T) {
 		{"Timeout", cfg.Timeout, 15 * time.Second},
 		{"Reconnect", cfg.Reconnect, true},
 		{"ReconnectDelayMax", cfg.ReconnectDelayMax, 5},
-		{"SegMaxRetry", cfg.SegMaxRetry, 3},
+		{"SegMaxRetry", cfg.SegMaxRetry, 0},
 		{"LogLevel", cfg.LogLevel, "info"},
 		{"ProgramID", cfg.ProgramID, -1},
 	}
@@ -83,7 +83,6 @@ func TestFFmpegRunner_buildArgs_Basic(t *testing.T) {
 		"-reconnect_on_network_error", "1",
 		"-reconnect_delay_max", "5",
 		"-user_agent", "go-ffmpeg-hls-swarm/1.0",
-		"-seg_max_retry", "3",
 		"-i", "http://example.com/stream.m3u8",
 		"-map", "0",
 		"-c", "copy",
@@ -689,6 +688,36 @@ func TestFFmpegRunner_PerClientUserAgent(t *testing.T) {
 			t.Errorf("Custom user agent should include client ID, got: %s", cmdStr)
 		}
 	})
+}
+
+// =============================================================================
+// Table-Driven Tests: SegMaxRetry (conditional flag)
+// =============================================================================
+
+func TestFFmpegRunner_buildArgs_SegMaxRetry(t *testing.T) {
+	tests := []struct {
+		name        string
+		segMaxRetry int
+		wantFlag    bool
+	}{
+		{"default zero omits flag", 0, false},
+		{"positive value includes flag", 3, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := DefaultFFmpegConfig("http://example.com/stream.m3u8")
+			cfg.SegMaxRetry = tt.segMaxRetry
+			runner := NewFFmpegRunner(cfg)
+			args := runner.buildArgs()
+			argsStr := strings.Join(args, " ")
+
+			hasFlag := strings.Contains(argsStr, "-seg_max_retry")
+			if hasFlag != tt.wantFlag {
+				t.Errorf("-seg_max_retry flag: got %v, want %v, args: %s", hasFlag, tt.wantFlag, argsStr)
+			}
+		})
+	}
 }
 
 // =============================================================================
