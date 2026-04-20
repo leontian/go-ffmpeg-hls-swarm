@@ -50,7 +50,7 @@ Orchestration Flags:
 		printFlagCategory([]string{"metrics", "v", "log-format"})
 
 		fmt.Fprintf(os.Stderr, "\nFFmpeg:\n")
-		printFlagCategory([]string{"ffmpeg", "user-agent", "timeout", "reconnect", "reconnect-delay", "seg-retry"})
+		printFlagCategory([]string{"ffmpeg", "user-agent", "timeout", "reconnect", "reconnect-delay", "seg-retry", "ffmpeg-re"})
 
 		fmt.Fprintf(os.Stderr, "\nHealth / Stall Detection:\n")
 		printFlagCategory([]string{"target-duration", "restart-on-stall"})
@@ -118,6 +118,7 @@ Examples:
 	flag.BoolVar(&cfg.Reconnect, "reconnect", cfg.Reconnect, "Enable FFmpeg reconnect flags")
 	flag.IntVar(&cfg.ReconnectDelayMax, "reconnect-delay", cfg.ReconnectDelayMax, "Max reconnect delay in seconds")
 	flag.IntVar(&cfg.SegMaxRetry, "seg-retry", cfg.SegMaxRetry, "Segment download retry count")
+	flag.BoolVar(&cfg.FFmpegRe, "ffmpeg-re", cfg.FFmpegRe, "Add -re flag to FFmpeg (read input at native frame rate)")
 
 	// Health / Stall Detection
 	flag.DurationVar(&cfg.TargetDuration, "target-duration", cfg.TargetDuration, "Expected HLS segment duration for stall detection")

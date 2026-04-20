@@ -87,6 +87,8 @@ type FFmpegConfig struct {
 	// would corrupt progress parsing on stdout).
 	DebugLogging bool
 
+	// Re enables the -re flag which reads input at native frame rate.
+	Re bool
 }
 
 // DefaultFFmpegConfig returns an FFmpegConfig with sensible defaults.
@@ -184,11 +186,18 @@ func (r *FFmpegRunner) buildArgs() []string {
 		logLevel = "repeat+level+datetime+" + baseLevel
 	}
 
-	args := []string{
+	var args []string
+
+	// -re must come before -i (and all other input options)
+	if r.config.Re {
+		args = append(args, "-re")
+	}
+
+	args = append(args,
 		"-hide_banner",
 		"-nostdin",
 		"-loglevel", logLevel,
-	}
+	)
 
 	// Progress output for stats parsing
 	// Always uses FD mode (pipe:3) when stats are enabled for clean separation from stderr

@@ -57,6 +57,7 @@ func New(cfg *config.Config, logger *slog.Logger) *Orchestrator {
 		StatsEnabled:  cfg.StatsEnabled,
 		StatsLogLevel: cfg.StatsLogLevel,
 		DebugLogging:  cfg.DebugLogging,
+		Re:            cfg.FFmpegRe,
 	}
 	runner := process.NewFFmpegRunner(ffmpegConfig)
 

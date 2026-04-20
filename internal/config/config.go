@@ -24,6 +24,7 @@ type Config struct {
 	ReconnectDelayMax int           `json:"reconnect_delay_max"`
 	SegMaxRetry       int           `json:"seg_max_retry"`
 	LogLevel          string        `json:"ffmpeg_log_level"`
+	FFmpegRe          bool          `json:"ffmpeg_re"` // Add -re flag (read input at native frame rate)
 
 	// Network
 	ResolveIP     string   `json:"resolve_ip"`

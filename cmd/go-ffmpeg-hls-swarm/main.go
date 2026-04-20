@@ -139,6 +139,7 @@ func printFFmpegCommand(cfg *config.Config) {
 		// Stats collection
 		StatsEnabled:  cfg.StatsEnabled,
 		StatsLogLevel: cfg.StatsLogLevel,
+		Re:            cfg.FFmpegRe,
 	}
 
 	runner := process.NewFFmpegRunner(ffmpegConfig)

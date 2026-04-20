@@ -721,6 +721,51 @@ func TestFFmpegRunner_buildArgs_SegMaxRetry(t *testing.T) {
 }
 
 // =============================================================================
+// Table-Driven Tests: Re (conditional flag)
+// =============================================================================
+
+func TestFFmpegRunner_buildArgs_Re(t *testing.T) {
+	tests := []struct {
+		name     string
+		re       bool
+		wantFlag bool
+	}{
+		{"re disabled omits flag", false, false},
+		{"re enabled includes flag", true, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := DefaultFFmpegConfig("http://example.com/stream.m3u8")
+			cfg.Re = tt.re
+			runner := NewFFmpegRunner(cfg)
+			args := runner.buildArgs()
+
+			reIdx := -1
+			inputIdx := -1
+			for i, a := range args {
+				if a == "-re" && reIdx == -1 {
+					reIdx = i
+				}
+				if a == "-i" && inputIdx == -1 {
+					inputIdx = i
+				}
+			}
+
+			hasFlag := reIdx != -1
+			if hasFlag != tt.wantFlag {
+				t.Errorf("-re flag: got %v, want %v, args: %s", hasFlag, tt.wantFlag, strings.Join(args, " "))
+			}
+
+			// When enabled, -re must appear before -i (ffmpeg requires input option ordering)
+			if tt.wantFlag && reIdx >= inputIdx {
+				t.Errorf("-re must come before -i: -re at %d, -i at %d, args: %s", reIdx, inputIdx, strings.Join(args, " "))
+			}
+		})
+	}
+}
+
+// =============================================================================
 // Edge Cases
 // =============================================================================
 
